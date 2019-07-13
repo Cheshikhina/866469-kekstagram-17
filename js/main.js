@@ -110,7 +110,7 @@ var effectLine = document.querySelector('.effect-level__line');
 var depthHandle = document.querySelector('.effect-level__depth');
 var uploadEffectLevelValue = document.querySelector('.effect-level__value');
 var uploadPreview = document.querySelector('.img-upload__preview');
-// var levelEffect;
+var uploadCommit = document.querySelector('.text__description');
 var valueEffect;
 var clickedElement = null;
 var effectCssStyle = {
@@ -305,4 +305,10 @@ var getFilter = function (curEffect, levelEffect) {
   uploadPreviewImg.style.filter = curEffect.effect + '(' + nowEffect() + curEffect.points + ')';
 };
 
-// console.log ();
+uploadCommit.addEventListener('focus', function () {
+  removeCloseEsc();
+});
+
+uploadCommit.addEventListener('blur', function () {
+  addCloseEsc();
+});
