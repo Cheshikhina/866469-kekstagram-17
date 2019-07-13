@@ -5,6 +5,9 @@ var PHOTO_ADRESS_MAX = 25;
 var LIKES_MIN = 15;
 var LIKES_MAX = 200;
 var AVATAR_MAX = 7;
+var SCALE_MIN = 0.25;
+var SCALE_MAX = 1;
+var LEVEL_MAX = 453;
 
 var сommentMessage = [
   ' - Всё отлично!',
@@ -87,6 +90,7 @@ renderPhotos();
 //
 
 var uploadFormOpen = document.querySelector('#upload-file');
+var uploadMainForm = document.querySelector('.img-upload__form');
 var uploadForm = document.querySelector('.img-upload__overlay');
 var uploadFormClose = document.querySelector('#upload-cancel');
 var uploadFormControlSmaller = uploadForm.querySelector('.scale__control--smaller');
@@ -94,24 +98,54 @@ var uploadFormControlBigger = uploadForm.querySelector('.scale__control--bigger'
 var uploadFormControlValue = document.querySelector('.scale__control--value');
 var uploadPreviewImg = document.querySelector('div.img-upload__preview img');
 var uploadEffectLevel = document.querySelector('.img-upload__effect-level');
-var effects = document.querySelectorAll('.effects__radio');
+var effectsParent = document.querySelector('.effects');
 var KeyCode = {
   ESC: 27,
   ENTER: 13,
 };
 var scaleChange = 0.25;
-var SCALE_MIN = 0.25;
-var SCALE_MAX = 1;
-var scale = [];
-
+var scale;
 var effectHandle = document.querySelector('.effect-level__pin');
+var effectLine = document.querySelector('.effect-level__line');
 var depthHandle = document.querySelector('.effect-level__depth');
 var uploadEffectLevelValue = document.querySelector('.effect-level__value');
 var uploadPreview = document.querySelector('.img-upload__preview');
-var LEVEL_MAX = 453;
-var levelEffect;
-var PERCENT_MAX = 100;
-
+// var levelEffect;
+var valueEffect;
+var clickedElement = null;
+var effectCssStyle = {
+  chrome: {
+    effect: 'grayscale',
+    maxvalue: 1,
+    minvalue: 0,
+    points: '',
+  },
+  sepia: {
+    effect: 'sepia',
+    maxvalue: 1,
+    minvalue: 0,
+    points: '',
+  },
+  marvin: {
+    effect: 'invert',
+    maxvalue: 100,
+    minvalue: 0,
+    points: '%',
+  },
+  phobos: {
+    effect: 'blur',
+    maxvalue: 3,
+    minvalue: 0,
+    points: 'px',
+  },
+  heat: {
+    effect: 'brightness',
+    maxvalue: 3,
+    minvalue: 1,
+    points: '',
+  },
+  none: null,
+};
 
 var formCloseEscHandler = function (evt) {
   if (evt.keyCode === KeyCode.ESC) {
@@ -132,7 +166,7 @@ var openForm = function () {
   addCloseEsc();
   getHiddenEffectLevel();
   updateUploadForm();
-  scale = [1];
+  scale = 1;
   uploadPreviewImg.style = 'transform: scale(' + scale + ')';
   uploadFormControlValue.setAttribute('value', 100 + '%');
   uploadPreview.style.filter = '';
@@ -149,6 +183,7 @@ var closeForm = function () {
   uploadForm.classList.add('hidden');
   removeCloseEsc();
   uploadPreviewImg.className = '';
+  uploadMainForm.reset();
 };
 
 uploadFormOpen.addEventListener('change', function () {
@@ -166,21 +201,21 @@ uploadFormClose.addEventListener('keydown', function (evt) {
 });
 
 var scaleControlSmaller = function () {
-  if (scale[0] === SCALE_MIN) {
+  if (scale === SCALE_MIN) {
     return;
   }
-  scale = [scale[scale.length - 1] - scaleChange];
+  scale = scale - scaleChange;
   uploadFormControlValue.setAttribute('value', scale * 100 + '%');
-  uploadPreviewImg.style = 'transform: scale(' + scale + ')';
+  uploadPreviewImg.style.transform = 'scale(' + scale + ')';
 };
 
 var scaleControlBigger = function () {
-  if (scale[0] === SCALE_MAX) {
+  if (scale === SCALE_MAX) {
     return;
   }
-  scale = [scale[scale.length - 1] + scaleChange];
+  scale = scale + scaleChange;
   uploadFormControlValue.setAttribute('value', scale * 100 + '%');
-  uploadPreviewImg.style = 'transform: scale(' + scale + ')';
+  uploadPreviewImg.style.transform = 'scale(' + scale + ')';
 };
 
 uploadFormControlSmaller.addEventListener('click', scaleControlSmaller);
@@ -205,51 +240,36 @@ var getHiddenEffectLevel = function () {
   uploadEffectLevel.classList.add('hidden');
 };
 
-var valueEffect;
-var clickedElement = null;
-
 var clickHandler = function (evt) {
-  clickedElement = evt.currentTarget;
-
-  if (clickedElement) {
-    updateUploadForm();
-    valueEffect = clickedElement.value;
-    uploadPreviewImg.classList.add('effects__preview--' + valueEffect);
-    if (valueEffect === 'none') {
-      getHiddenEffectLevel();
-      uploadPreview.style.filter = '';
-    } else {
-      getVisibleEffectLevel();
-      uploadPreview.style.filter = effectCssStyle[valueEffect][0] + effectCssStyle[valueEffect][2] + effectCssStyle[valueEffect][3];
-    }
+  if (evt.target.tagName !== 'INPUT') {
+    return;
   }
-
+  evt.stopPropagation();
+  clickedElement = evt.target;
+  updateUploadForm();
+  valueEffect = clickedElement.value;
+  uploadPreviewImg.classList.add('effects__preview--' + valueEffect);
+  if (valueEffect === 'none') {
+    getHiddenEffectLevel();
+    uploadPreviewImg.style.filter = '';
+  } else {
+    getVisibleEffectLevel();
+    var curEffect = effectCssStyle[valueEffect];
+    uploadPreviewImg.style.filter = curEffect.effect + '(' + curEffect.maxvalue + curEffect.points + ')';
+  }
 };
 
-for (var i = 0; i < effects.length; ++i) {
-  effects[i].addEventListener('click', clickHandler, true);
-}
+effectsParent.addEventListener('click', clickHandler);
 
 effectHandle.addEventListener('mousedown', function (evt) {
   evt.preventDefault();
 
-  var startCoords = {
-    x: evt.clientX,
-  };
+  var startLineCoords = effectLine.getBoundingClientRect();
 
-  var onMouseMove = function (moveEvt) {
+  var onMouseMove = function (moveEvt, levelEffect) {
     moveEvt.preventDefault();
 
-    var shift = {
-      x: startCoords.x - moveEvt.clientX,
-    };
-
-    startCoords = {
-      x: moveEvt.clientX,
-    };
-
-    levelEffect = effectHandle.offsetLeft - shift.x;
-
+    levelEffect = moveEvt.clientX - startLineCoords.x;
 
     if (levelEffect < 0) {
       levelEffect = 0;
@@ -261,7 +281,7 @@ effectHandle.addEventListener('mousedown', function (evt) {
     depthHandle.style.width = levelEffect + 'px';
 
     uploadEffectLevelValue.setAttribute('value', levelEffect);
-    getFilter();
+    getFilter(effectCssStyle[valueEffect], levelEffect);
   };
 
   var onMouseUp = function (upEvt) {
@@ -275,21 +295,14 @@ effectHandle.addEventListener('mousedown', function (evt) {
   document.addEventListener('mouseup', onMouseUp);
 });
 
-var effectCssStyle = {
-  chrome: ['grayscale(', 0, 1, ')'],
-  sepia: ['sepia(', 0, 1, ')'],
-  marvin: ['invert(', 100, 0, '%)'],
-  phobos: ['blur(', 0, 3, 'px)'],
-  heat: ['brightness(', 1, 3, ')'],
-};
-
-var getFilter = function () {
-  var nowPixel = levelEffect * PERCENT_MAX / LEVEL_MAX;
-  var nowEffect = (effectCssStyle[valueEffect][2] - effectCssStyle[valueEffect][1]) / PERCENT_MAX * nowPixel + effectCssStyle[valueEffect][1];
+var getFilter = function (curEffect, levelEffect) {
+  var nowEffect = function () {
+    return (curEffect.maxvalue - curEffect.minvalue) * levelEffect / LEVEL_MAX + curEffect.minvalue;
+  };
   if (valueEffect === 'none') {
-    uploadPreview.style.filter = '';
+    uploadPreviewImg.style.filter = '';
   }
-  uploadPreview.style.filter = effectCssStyle[valueEffect][0] + nowEffect + effectCssStyle[valueEffect][3];
+  uploadPreviewImg.style.filter = curEffect.effect + '(' + nowEffect() + curEffect.points + ')';
 };
 
 // console.log ();
