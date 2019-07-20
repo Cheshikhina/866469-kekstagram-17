@@ -21,9 +21,9 @@
   var uploadPreview = document.querySelector('.img-upload__preview');
   var uploadCommit = document.querySelector('.text__description');
   var scale;
+  var scaleChange = 0.25;
   var valueEffect;
   var clickedElement = null;
-  var scaleChange = 0.25;
   var KeyCode = {
     ESC: 27,
     ENTER: 13,
