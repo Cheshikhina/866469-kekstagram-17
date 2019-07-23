@@ -1,12 +1,11 @@
 'use strict';
 
-(function () {
+window.picture = (function () {
   var PHOTO_ADRESS_MIN = 1;
   var PHOTO_ADRESS_MAX = 25;
   var LIKES_MIN = 15;
   var LIKES_MAX = 200;
   var AVATAR_MAX = 7;
-
 
   var сommentMessage = [
     ' - Всё отлично!',
@@ -34,11 +33,6 @@
     'Артем'
   ];
 
-  var similarListElement = document.querySelector('.pictures');
-  var similarPictureTemplate = document.querySelector('#picture')
-    .content
-    .querySelector('.picture');
-
   var getRandomInt = function (min, max) {
     return Math.floor(Math.random() * (max - min)) + min;
   };
@@ -63,27 +57,8 @@
     return pictures;
   };
 
-  var renderPhoto = function (photo) {
-    var photoElement = similarPictureTemplate.cloneNode(true);
-
-    photoElement.querySelector('.picture__img').src = photo.url;
-    photoElement.querySelector('.picture__likes').textContent = photo.likes;
-    photoElement.querySelector('.picture__comments').textContent = photo.comments.length;
-
-    return photoElement;
+  return {
+    getData: getData,
   };
-
-  var renderPhotos = function () {
-    var fragment = document.createDocumentFragment();
-    var photosData = getData();
-
-    for (var i = 0; i < photosData.length; i++) {
-      fragment.appendChild(renderPhoto(photosData[i]));
-    }
-
-    similarListElement.appendChild(fragment);
-  };
-
-  renderPhotos();
 
 })();
