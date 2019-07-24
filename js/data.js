@@ -16,17 +16,27 @@
     return photoElement;
   };
 
-  var renderPhotos = function () {
+  var successHandler = function (pictures) {
     var fragment = document.createDocumentFragment();
-    var photosData = window.picture.getData();
 
-    for (var i = 0; i < photosData.length; i++) {
-      fragment.appendChild(renderPhoto(photosData[i]));
+    for (var i = 0; i < pictures.length; i++) {
+      fragment.appendChild(renderPhoto(pictures[i]));
     }
-
     similarListElement.appendChild(fragment);
   };
 
-  renderPhotos();
+  var errorHandler = function (errorMessage) {
+    var node = document.createElement('div');
+    node.style = 'z-index: 100; margin: 330px auto; text-align: center; padding: 15px; background-color: red;';
+    node.style.position = 'absolute';
+    node.style.left = 0;
+    node.style.right = 0;
+    node.style.fontSize = '30px';
+
+    node.textContent = errorMessage;
+    document.body.insertAdjacentElement('afterbegin', node);
+  };
+
+  window.backend.load(successHandler, errorHandler);
 
 })();
