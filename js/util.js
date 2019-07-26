@@ -1,7 +1,6 @@
 'use strict';
 
 window.util = (function () {
-  var DEBOUNCE_INTERVAL = 500;
 
   var shuffle = function (arr) {
     for (var i = arr.length - 1; i > 0; i--) {
@@ -13,7 +12,7 @@ window.util = (function () {
     return arr;
   };
 
-  var debounce = function (cb) {
+  var debounce = function (cb, interval) {
     var lastTimeout = null;
 
     return function () {
@@ -23,7 +22,7 @@ window.util = (function () {
       }
       lastTimeout = window.setTimeout(function () {
         cb.apply(null, parameters);
-      }, DEBOUNCE_INTERVAL);
+      }, interval);
     };
   };
 

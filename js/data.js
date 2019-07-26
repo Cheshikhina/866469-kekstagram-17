@@ -1,6 +1,7 @@
 'use strict';
 
 (function () {
+  var DEBOUNCE_INTERVAL = 500;
   var butonsForm = document.querySelector('.img-filters__form');
   var butons = document.querySelectorAll('.img-filters__button');
 
@@ -55,6 +56,6 @@
       item.remove();
     });
     window.render.newPhotos(copyOurPictures);
-  });
+  }, DEBOUNCE_INTERVAL);
 
 })();
