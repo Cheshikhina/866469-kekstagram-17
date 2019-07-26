@@ -1,22 +1,13 @@
 'use strict';
 
 (function () {
-  var similarListElement = document.querySelector('.pictures');
   var butonsForm = document.querySelector('.img-filters__form');
-  var butons = Array.from(document.querySelectorAll('.img-filters__button'));
-  var DEBOUNCE_INTERVAL = 500;
-  var lastTimeout;
+  var butons = document.querySelectorAll('.img-filters__button');
 
   var ourPictures = [];
   var successHandler = function (pictures) {
-    var fragment = document.createDocumentFragment();
-
-    pictures.forEach(function (picture) {
-      fragment.appendChild(window.render.renderPhoto(picture));
-    });
     ourPictures = pictures;
-
-    similarListElement.appendChild(fragment);
+    window.render.newPhotos(pictures);
 
     var imgFilter = document.querySelector('.img-filters');
     imgFilter.classList.remove('img-filters--inactive');
@@ -38,8 +29,7 @@
 
   window.backend.load(successHandler, errorHandler);
 
-
-  var clickHandler = function (evt) {
+  var clickHandler = window.util.debounce(function (evt) {
     var copyOurPictures = ourPictures.slice();
     var clickedElement = evt.target;
     evt.stopPropagation();
@@ -48,35 +38,23 @@
       it.className = 'img-filters__button';
     });
 
-    var clickedElementFilter = clickedElement.id;
     clickedElement.classList.add('img-filters__button--active');
 
-    if (clickedElementFilter === 'filter-discussed') {
+    if (clickedElement.id === 'filter-discussed') {
       copyOurPictures = copyOurPictures.sort(function (a, b) {
         return b.comments.length - a.comments.length;
       });
     }
-    if (clickedElementFilter === 'filter-new') {
-      var shuffle = function (arr) {
-        for (var i = arr.length - 1; i > 0; i--) {
-          var num = Math.floor(Math.random() * (i + 1));
-          var d = arr[num];
-          arr[num] = arr[i];
-          arr[i] = d;
-        }
-        return arr;
-      };
-      shuffle(copyOurPictures);
+    if (clickedElement.id === 'filter-new') {
+      window.util.shuffle(copyOurPictures);
       copyOurPictures = copyOurPictures.slice(0, 10);
     }
 
-    if (lastTimeout) {
-      window.clearTimeout(lastTimeout);
-    }
-    lastTimeout = window.setTimeout(function () {
-      window.render.renderPhotos(copyOurPictures);
-    }, DEBOUNCE_INTERVAL);
-
-  };
+    var allPhotos = document.querySelectorAll('.pictures .picture');
+    allPhotos.forEach(function (item) {
+      item.remove();
+    });
+    window.render.newPhotos(copyOurPictures);
+  });
 
 })();
