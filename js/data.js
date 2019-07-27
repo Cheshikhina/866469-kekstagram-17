@@ -4,6 +4,8 @@
   var DEBOUNCE_INTERVAL = 500;
   var butonsForm = document.querySelector('.img-filters__form');
   var butons = document.querySelectorAll('.img-filters__button');
+  var photos = document.querySelector('.pictures');
+  var copyOurPictures = [];
 
   var ourPictures = [];
   var successHandler = function (pictures) {
@@ -31,7 +33,7 @@
   window.backend.load(successHandler, errorHandler);
 
   var clickHandler = window.util.debounce(function (evt) {
-    var copyOurPictures = ourPictures.slice();
+    copyOurPictures = ourPictures.slice();
     var clickedElement = evt.target;
     evt.stopPropagation();
 
@@ -57,5 +59,18 @@
     });
     window.render.newPhotos(copyOurPictures);
   }, DEBOUNCE_INTERVAL);
+
+  photos.addEventListener('click', function (evt) {
+    var clickedElement = evt.target;
+    evt.stopPropagation();
+
+    var clickedElementSrc = clickedElement.src.split('kekstagram/').pop();
+
+    ourPictures.find(function (it) {
+      if (it.url === clickedElementSrc) {
+        window.preview.getBigPhoto(it);
+      }
+    });
+  });
 
 })();

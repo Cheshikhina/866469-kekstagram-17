@@ -1,6 +1,10 @@
 'use strict';
 
 window.util = (function () {
+  var KeyCode = {
+    ESC: 27,
+    ENTER: 13,
+  };
 
   var shuffle = function (arr) {
     for (var i = arr.length - 1; i > 0; i--) {
@@ -26,9 +30,23 @@ window.util = (function () {
     };
   };
 
+  var getRandomInt = function (min, max) {
+    return Math.floor(Math.random() * (max - min)) + min;
+  };
+
+  var removeElementsByClass = function (className) {
+    var elements = document.getElementsByClassName(className);
+    while (elements.length > 0) {
+      elements[0].parentNode.removeChild(elements[0]);
+    }
+  };
+
   return {
     shuffle: shuffle,
     debounce: debounce,
+    getRandomInt: getRandomInt,
+    KeyCode: KeyCode,
+    removeElementsByClass: removeElementsByClass,
   };
 
 })();
