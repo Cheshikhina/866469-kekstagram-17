@@ -24,10 +24,7 @@
   var scaleChange = 0.25;
   var valueEffect;
   var clickedElement = null;
-  var KeyCode = {
-    ESC: 27,
-    ENTER: 13,
-  };
+
   var effectCssStyle = {
     chrome: {
       effect: 'grayscale',
@@ -63,7 +60,7 @@
   };
 
   var formCloseEscHandler = function (evt) {
-    if (evt.keyCode === KeyCode.ESC) {
+    if (evt.keyCode === window.util.KeyCode.ESC) {
       closeForm();
     }
   };
@@ -165,21 +162,21 @@
   });
 
   uploadFormClose.addEventListener('keydown', function (evt) {
-    if (evt.keyCode === KeyCode.ENTER) {
+    if (evt.keyCode === window.util.KeyCode.ENTER) {
       closeForm();
     }
   });
 
   uploadFormControlSmaller.addEventListener('click', scaleControlSmaller);
   uploadFormControlSmaller.addEventListener('keydown', function (evt) {
-    if (evt.keyCode === KeyCode.ENTER) {
+    if (evt.keyCode === window.util.KeyCode.ENTER) {
       scaleControlSmaller();
     }
   });
 
   uploadFormControlBigger.addEventListener('click', scaleControlBigger);
   uploadFormControlBigger.addEventListener('keydown', function (evt) {
-    if (evt.keyCode === KeyCode.ENTER) {
+    if (evt.keyCode === window.util.KeyCode.ENTER) {
       scaleControlBigger();
     }
   });

@@ -4,6 +4,7 @@
   var DEBOUNCE_INTERVAL = 500;
   var butonsForm = document.querySelector('.img-filters__form');
   var butons = document.querySelectorAll('.img-filters__button');
+  var copyOurPictures = [];
 
   var ourPictures = [];
   var successHandler = function (pictures) {
@@ -31,7 +32,7 @@
   window.backend.load(successHandler, errorHandler);
 
   var clickHandler = window.util.debounce(function (evt) {
-    var copyOurPictures = ourPictures.slice();
+    copyOurPictures = ourPictures.slice();
     var clickedElement = evt.target;
     evt.stopPropagation();
 
