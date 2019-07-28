@@ -13,7 +13,9 @@ window.render = (function () {
     photoElement.querySelector('.picture__likes').textContent = photo.likes;
     photoElement.querySelector('.picture__comments').textContent = photo.comments.length;
 
-    // .addEventListener('click', window.preview.getBigPhoto(photo));
+    photoElement.addEventListener('click', function () {
+      window.preview.getBigPhoto(photo);
+    });
 
     return photoElement;
   };
