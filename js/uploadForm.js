@@ -188,7 +188,7 @@
 
     var startLineCoords = effectLine.getBoundingClientRect();
 
-    var onMouseMove = function (moveEvt, levelEffect) {
+    var mouseMoveHandler = function (moveEvt, levelEffect) {
       moveEvt.preventDefault();
 
       levelEffect = moveEvt.clientX - startLineCoords.x;
@@ -206,15 +206,15 @@
       getFilter(effectCssStyle[valueEffect], levelEffect);
     };
 
-    var onMouseUp = function (upEvt) {
+    var mouseUpHandler = function (upEvt) {
       upEvt.preventDefault();
 
-      document.removeEventListener('mousemove', onMouseMove);
-      document.removeEventListener('mouseup', onMouseUp);
+      document.removeEventListener('mousemove', mouseMoveHandler);
+      document.removeEventListener('mouseup', mouseUpHandler);
     };
 
-    document.addEventListener('mousemove', onMouseMove);
-    document.addEventListener('mouseup', onMouseUp);
+    document.addEventListener('mousemove', mouseMoveHandler);
+    document.addEventListener('mouseup', mouseUpHandler);
   });
 
   uploadCommit.addEventListener('focus', function () {
@@ -224,5 +224,31 @@
   uploadCommit.addEventListener('blur', function () {
     addCloseEsc();
   });
+
+  //
+  // var textHashtag = uploadForm.querySelector('.text__hashtags');
+  // var textDescription = document.querySelector('.text__description');
+  // var uploadButton = uploadForm.querySelector('.img-upload__submit');
+  // console.log(textDescription.value.length);
+  // var inputHashtagHandler = function () {};
+  // var inputDescriptionHandler = function () {
+  //   if (textDescription.value.length > 140) {
+  //     console.log(textDescription.value.length);
+  //     console.log(textDescription.value);
+  //     console.log(textDescription);
+  //     textDescription.setCustomValidity('Длина комментария не может составлять больше 140 символов');
+  //     textDescription.value = 'Длина комментария не может составлять больше 140 символов';
+  //     uploadButton.addEventListener('submiit', function (evt) {
+  //       evt.preventDefault();
+  //     });
+  //   } else {
+  //     textDescription.setCustomValidity('');
+  //   }
+  // };
+
+  // textHashtag.addEventListener('input', inputHashtagHandler);
+  // textDescription.addEventListener('input', function () {
+  //   inputDescriptionHandler();
+  // });
 
 })();
