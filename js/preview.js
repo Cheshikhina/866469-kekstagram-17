@@ -22,15 +22,9 @@ window.preview = (function () {
   var getComments = function (comments) {
     var fragment = document.createDocumentFragment();
 
-    var getCurrentIndex = function () {
-      if (comments.length > CURRENT_LIMIT) {
-        return CURRENT_LIMIT;
-      } else {
-        return comments.length;
-      }
-    };
+    var сurrentIndex = Math.min(comments.length, CURRENT_LIMIT);
 
-    for (var i = 0; i < getCurrentIndex(); i++) {
+    for (var i = 0; i < сurrentIndex; i++) {
       fragment.appendChild(getComment(comments[i]));
     }
 

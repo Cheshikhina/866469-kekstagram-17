@@ -4,6 +4,9 @@
   var SCALE_MIN = 0.25;
   var SCALE_MAX = 1;
   var LEVEL_MAX = 453;
+  var TAG_MAX = 5;
+  var TAG_LENGT_MAX = 20;
+  var ERROR_TAG = 'border: 2px solid red; background-color: #ffc1ab;';
   var uploadFormOpen = document.querySelector('#upload-file');
   var uploadMainForm = document.querySelector('.img-upload__form');
   var uploadForm = document.querySelector('.img-upload__overlay');
@@ -20,6 +23,8 @@
   var uploadEffectLevelValue = document.querySelector('.effect-level__value');
   var uploadPreview = document.querySelector('.img-upload__preview');
   var uploadCommit = document.querySelector('.text__description');
+  var textHashtag = uploadForm.querySelector('.text__hashtags');
+  var textDescription = document.querySelector('.text__description');
   var scale;
   var scaleChange = 0.25;
   var valueEffect;
@@ -82,6 +87,8 @@
     uploadPreviewImg.style = 'transform: scale(' + scale + ')';
     uploadFormControlValue.setAttribute('value', 100 + '%');
     uploadPreview.style.filter = '';
+    textHashtag.addEventListener('input', inputHashtagHandler);
+    textDescription.addEventListener('input', inputDescriptionHandler);
   };
 
   var updateUploadForm = function () {
@@ -95,7 +102,11 @@
     uploadForm.classList.add('hidden');
     removeCloseEsc();
     uploadPreviewImg.className = '';
+    textHashtag.style = '';
+    textDescription.style = '';
     uploadMainForm.reset();
+    textHashtag.removeEventListener('input', inputHashtagHandler);
+    textDescription.removeEventListener('input', inputDescriptionHandler);
   };
 
   var scaleControlSmaller = function () {
@@ -226,29 +237,146 @@
   });
 
   //
-  // var textHashtag = uploadForm.querySelector('.text__hashtags');
-  // var textDescription = document.querySelector('.text__description');
-  // var uploadButton = uploadForm.querySelector('.img-upload__submit');
-  // console.log(textDescription.value.length);
-  // var inputHashtagHandler = function () {};
-  // var inputDescriptionHandler = function () {
-  //   if (textDescription.value.length > 140) {
-  //     console.log(textDescription.value.length);
-  //     console.log(textDescription.value);
-  //     console.log(textDescription);
-  //     textDescription.setCustomValidity('Длина комментария не может составлять больше 140 символов');
-  //     textDescription.value = 'Длина комментария не может составлять больше 140 символов';
-  //     uploadButton.addEventListener('submiit', function (evt) {
-  //       evt.preventDefault();
-  //     });
-  //   } else {
-  //     textDescription.setCustomValidity('');
-  //   }
-  // };
 
-  // textHashtag.addEventListener('input', inputHashtagHandler);
-  // textDescription.addEventListener('input', function () {
-  //   inputDescriptionHandler();
-  // });
+  // var uploadButton = uploadForm.querySelector('.img-upload__submit');
+
+
+  var inputHashtagHandler = function () {
+    var allTags = [];
+    allTags = textHashtag.value.trim().toLowerCase().split(' ' || ', ');
+
+    textHashtag.style = '';
+
+    var checkFirstSimbol = function (arr) {
+      var a;
+      arr.some(function (item) {
+        if (item[0] !== '#') {
+          a = false;
+        } else {
+          a = true;
+        }
+      });
+      return a;
+    };
+
+    var checkOneHashtag = function (arr) {
+      var a;
+      arr.some(function (item) {
+        if (item[0] === '#' && item.length === 1) {
+          a = false;
+        } else {
+          a = true;
+        }
+      });
+      return a;
+    };
+
+    var sameHashtag = allTags.every(function (elem, i, array) {
+      return array.lastIndexOf(elem) === i;
+    });
+
+    var checkLengthHashtag = function (arr, max) {
+      var a;
+      arr.some(function (item) {
+        if (item.length > max) {
+          a = false;
+        } else {
+          a = true;
+        }
+      });
+      return a;
+    };
+
+    if (textHashtag.value.trim() === '') {
+      textHashtag.setCustomValidity('');
+      textHashtag.style = '';
+    } else {
+      if (checkFirstSimbol(allTags) === false) {
+        textHashtag.setCustomValidity('Xэш-тег начинается с символа # (решётка)');
+        textHashtag.style = ERROR_TAG;
+      }
+      if (checkOneHashtag(allTags) === false) {
+        textHashtag.setCustomValidity('Xеш-тег не может состоять только из одного символа # (решётка)');
+        textHashtag.style = ERROR_TAG;
+      }
+      if (sameHashtag === false) {
+        textHashtag.setCustomValidity('Один и тот же хэш-тег не может быть использован дважды');
+        textHashtag.style = ERROR_TAG;
+      }
+      if (allTags.length > TAG_MAX) {
+        textHashtag.setCustomValidity('Нельзя указать больше ' + TAG_MAX + ' хэш-тегов');
+        textHashtag.style = ERROR_TAG;
+      }
+      if (checkLengthHashtag(allTags, TAG_LENGT_MAX) === false) {
+        textHashtag.setCustomValidity('Максимальная длина одного хэш-тега 20 символов, включая символ # (решётка)');
+        textHashtag.style = ERROR_TAG;
+      }
+    }
+  };
+
+  var inputDescriptionHandler = function () {
+    var allSimbol = textDescription.value.split('');
+    textDescription.style = '';
+
+    if (allSimbol.length > 140) {
+      textDescription.setCustomValidity('Длина комментария не может составлять больше 140 символов');
+      textDescription.style = ERROR_TAG;
+    }
+  };
+
+  textHashtag.addEventListener('focus', function () {
+    removeCloseEsc();
+  });
+
+  textHashtag.addEventListener('blur', function () {
+    addCloseEsc();
+  });
+
+  textDescription.addEventListener('focus', function () {
+    removeCloseEsc();
+  });
+
+  textDescription.addEventListener('blur', function () {
+    addCloseEsc();
+  });
+
+  //
+
+  var formSuccessHandler = function () {
+    closeForm();
+
+    var similarSucessMessage = document.querySelector('#success')
+      .content
+      .querySelector('.success');
+
+    var sucessMessage = similarSucessMessage.cloneNode(true);
+    document.querySelector('.main').appendChild(sucessMessage);
+
+    var success = document.querySelector('.success');
+
+    var successButton = document.querySelector('.success__button');
+    successButton.addEventListener('click', function () {
+      document.querySelector('.main').removeChild(success);
+    });
+  };
+
+  var formErrorHandler = function () {
+    var similarErrorMessage = document.querySelector('#error')
+      .content
+      .querySelector('.error');
+
+    var errorMessage = similarErrorMessage.cloneNode(true);
+    document.querySelector('.main').appendChild(errorMessage);
+
+    var error = document.querySelector('.error');
+
+    var errorButton = document.querySelector('.error__button');
+    errorButton.addEventListener('click', function () {
+      document.querySelector('.main').removeChild(error);
+
+    });
+  };
+
+  window.backend.save(new FormData(uploadMainForm), formSuccessHandler, formErrorHandler);
 
 })();
