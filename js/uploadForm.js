@@ -25,7 +25,6 @@
   var uploadCommit = document.querySelector('.text__description');
   var textHashtag = uploadForm.querySelector('.text__hashtags');
   var textDescription = document.querySelector('.text__description');
-  var uploadButton = uploadForm.querySelector('.img-upload__submit');
   var scale;
   var scaleChange = 0.25;
   var valueEffect;
@@ -91,7 +90,7 @@
     uploadPreview.style.filter = '';
     textHashtag.addEventListener('input', inputHashtagHandler);
     textDescription.addEventListener('input', inputDescriptionHandler);
-    uploadButton.addEventListener('click', pressUploadButton);
+    uploadMainForm.addEventListener('submit', pressUploadButton);
   };
 
   var updateUploadForm = function () {
@@ -110,7 +109,7 @@
     uploadMainForm.reset();
     textHashtag.removeEventListener('input', inputHashtagHandler);
     textDescription.removeEventListener('input', inputDescriptionHandler);
-    uploadButton.removeEventListener('click', pressUploadButton);
+    uploadMainForm.removeEventListener('submit', pressUploadButton);
   };
 
   var scaleControlSmaller = function () {
@@ -343,7 +342,6 @@
 
   //
 
-
   var formSuccessHandler = function () {
     closeForm();
     var similarSucessMessage = document.querySelector('#success')
@@ -359,9 +357,10 @@
     var closeSuccessMessage = function () {
       document.querySelector('main').removeChild(success);
       successButton.removeEventListener('click', closeSuccessMessage);
+      document.removeEventListener('click', addCloseSuccessMessageClickAll);
     };
 
-    var addCloseEscMessage = function () {
+    var addCloseEscSuccessMessage = function () {
       document.addEventListener('keydown', function (evt) {
         if (evt.keyCode === window.util.KeyCode.ESC) {
           closeSuccessMessage();
@@ -369,17 +368,20 @@
       });
     };
 
-    // var addCloseClickAll = function () {
-    // };
+    var addCloseSuccessMessageClickAll = function (evt) {
+      var clickElement = evt.target;
+      if (clickElement.className === 'success') {
+        closeSuccessMessage();
+      }
+    };
 
-    addCloseEscMessage();
-    // addCloseClickAll();
+    addCloseEscSuccessMessage();
+    document.addEventListener('click', addCloseSuccessMessageClickAll);
     successButton.addEventListener('click', closeSuccessMessage);
   };
 
   var formErrorHandler = function () {
     uploadForm.classList.add('hidden');
-    // addCloseEsc();
     var similarErrorMessage = document.querySelector('#error')
       .content
       .querySelector('.error');
@@ -399,7 +401,7 @@
         uploadForm.classList.remove('hidden');
       }
       if (clickedButton.innerText === 'ЗАГРУЗИТЬ ДРУГОЙ ФАЙЛ') {
-        closeForm();
+        closeErrorMessage();
         var uploadFormOpenAvto = function (elem, event) {
           var changeEvent = new Event(event);
           elem.dispatchEvent(changeEvent);
@@ -410,6 +412,29 @@
       document.querySelector('main').removeChild(error);
     };
 
+    var closeErrorMessage = function () {
+      document.querySelector('main').removeChild(error);
+      errorButtons.removeEventListener('click', clickErrorButtonHandler);
+      document.removeEventListener('click', addCloseErrorMessageClickAll);
+    };
+
+    var addCloseEscErrorMessage = function () {
+      document.addEventListener('keydown', function (evt) {
+        if (evt.keyCode === window.util.KeyCode.ESC) {
+          closeErrorMessage();
+        }
+      });
+    };
+
+    var addCloseErrorMessageClickAll = function (evt) {
+      var clickElement = evt.target;
+      if (clickElement.className === 'error') {
+        closeErrorMessage();
+      }
+    };
+
+    addCloseEscErrorMessage();
+    document.addEventListener('click', addCloseErrorMessageClickAll);
     errorButtons.addEventListener('click', clickErrorButtonHandler);
   };
 

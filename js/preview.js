@@ -41,7 +41,6 @@ window.preview = (function () {
     commentLoader.classList.remove('visually-hidden');
 
     if (allComments.length < CURRENT_LIMIT) {
-      commentCount.classList.add('visually-hidden');
       commentLoader.classList.add('visually-hidden');
     }
 
@@ -57,12 +56,10 @@ window.preview = (function () {
 
 
     var commentLoaderHandler = function () {
-      window.util.removeElementsByClass('social__comment');
       allComments = allComments.slice(CURRENT_LIMIT);
 
-      if (allComments.length < CURRENT_LIMIT) {
+      if (allComments.length < CURRENT_LIMIT || allComments.length % CURRENT_LIMIT === 0) {
         commentLoader.classList.add('visually-hidden');
-        commentCount.classList.add('visually-hidden');
       }
 
       getComments(allComments);
