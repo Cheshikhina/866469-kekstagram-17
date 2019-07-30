@@ -25,6 +25,7 @@
   var uploadCommit = document.querySelector('.text__description');
   var textHashtag = uploadForm.querySelector('.text__hashtags');
   var textDescription = document.querySelector('.text__description');
+  var uploadButton = uploadForm.querySelector('.img-upload__submit');
   var scale;
   var scaleChange = 0.25;
   var valueEffect;
@@ -74,6 +75,7 @@
     document.addEventListener('keydown', formCloseEscHandler);
   };
 
+
   var removeCloseEsc = function () {
     document.removeEventListener('keydown', formCloseEscHandler);
   };
@@ -89,6 +91,7 @@
     uploadPreview.style.filter = '';
     textHashtag.addEventListener('input', inputHashtagHandler);
     textDescription.addEventListener('input', inputDescriptionHandler);
+    uploadButton.addEventListener('click', pressUploadButton);
   };
 
   var updateUploadForm = function () {
@@ -107,6 +110,7 @@
     uploadMainForm.reset();
     textHashtag.removeEventListener('input', inputHashtagHandler);
     textDescription.removeEventListener('input', inputDescriptionHandler);
+    uploadButton.removeEventListener('click', pressUploadButton);
   };
 
   var scaleControlSmaller = function () {
@@ -238,9 +242,6 @@
 
   //
 
-  // var uploadButton = uploadForm.querySelector('.img-upload__submit');
-
-
   var inputHashtagHandler = function () {
     var allTags = [];
     allTags = textHashtag.value.trim().toLowerCase().split(' ' || ', ');
@@ -342,41 +343,80 @@
 
   //
 
+
   var formSuccessHandler = function () {
     closeForm();
-
     var similarSucessMessage = document.querySelector('#success')
       .content
       .querySelector('.success');
-
     var sucessMessage = similarSucessMessage.cloneNode(true);
-    document.querySelector('.main').appendChild(sucessMessage);
+    document.querySelector('main').appendChild(sucessMessage);
 
     var success = document.querySelector('.success');
 
     var successButton = document.querySelector('.success__button');
-    successButton.addEventListener('click', function () {
-      document.querySelector('.main').removeChild(success);
-    });
+
+    var closeSuccessMessage = function () {
+      document.querySelector('main').removeChild(success);
+      successButton.removeEventListener('click', closeSuccessMessage);
+    };
+
+    var addCloseEscMessage = function () {
+      document.addEventListener('keydown', function (evt) {
+        if (evt.keyCode === window.util.KeyCode.ESC) {
+          closeSuccessMessage();
+        }
+      });
+    };
+
+    // var addCloseClickAll = function () {
+    // };
+
+    addCloseEscMessage();
+    // addCloseClickAll();
+    successButton.addEventListener('click', closeSuccessMessage);
   };
 
   var formErrorHandler = function () {
+    uploadForm.classList.add('hidden');
+    // addCloseEsc();
     var similarErrorMessage = document.querySelector('#error')
       .content
       .querySelector('.error');
 
     var errorMessage = similarErrorMessage.cloneNode(true);
-    document.querySelector('.main').appendChild(errorMessage);
+    document.querySelector('main').appendChild(errorMessage);
 
     var error = document.querySelector('.error');
 
-    var errorButton = document.querySelector('.error__button');
-    errorButton.addEventListener('click', function () {
-      document.querySelector('.main').removeChild(error);
+    var errorButtons = document.querySelector('.error__buttons');
 
-    });
+    var clickErrorButtonHandler = function (evt) {
+      var clickedButton = evt.target;
+      evt.stopPropagation();
+
+      if (clickedButton.innerText === 'ПОПРОБОВАТЬ СНОВА') {
+        uploadForm.classList.remove('hidden');
+      }
+      if (clickedButton.innerText === 'ЗАГРУЗИТЬ ДРУГОЙ ФАЙЛ') {
+        closeForm();
+        var uploadFormOpenAvto = function (elem, event) {
+          var changeEvent = new Event(event);
+          elem.dispatchEvent(changeEvent);
+        };
+        uploadFormOpenAvto(uploadFormOpen, 'change');
+      }
+
+      document.querySelector('main').removeChild(error);
+    };
+
+    errorButtons.addEventListener('click', clickErrorButtonHandler);
   };
 
-  window.backend.save(new FormData(uploadMainForm), formSuccessHandler, formErrorHandler);
+
+  var pressUploadButton = function (evt) {
+    evt.preventDefault();
+    window.backend.save(new FormData(uploadMainForm), formSuccessHandler, formErrorHandler);
+  };
 
 })();
