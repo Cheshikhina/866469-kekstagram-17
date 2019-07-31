@@ -1,6 +1,7 @@
 'use strict';
 
 window.backend = (function () {
+  var TIMEOUT = 10000;
   var Url = {
     DATA: 'https://js.dump.academy/kekstagram/data',
     SEND: 'https://js.dump.academy/kekstagram',
@@ -10,12 +11,8 @@ window.backend = (function () {
     SUCESS: 200,
   };
 
-  var TIMEOUT = 10000;
-
-  var load = function (onLoad, onError) {
-    var xhr = new XMLHttpRequest();
+  var request = function (onLoad, onError, xhr) {
     xhr.responseType = 'json';
-
     xhr.addEventListener('load', function () {
       if (xhr.status === Code.SUCESS) {
         onLoad(xhr.response);
@@ -31,6 +28,11 @@ window.backend = (function () {
     });
 
     xhr.timeout = TIMEOUT;
+  };
+
+  var load = function (onLoad, onError) {
+    var xhr = new XMLHttpRequest();
+    request(onLoad, onError, xhr);
 
     xhr.open('GET', Url.DATA);
     xhr.send();
@@ -38,23 +40,7 @@ window.backend = (function () {
 
   var save = function (data, onLoad, onError) {
     var xhr = new XMLHttpRequest();
-    xhr.responseType = 'json';
-
-    xhr.addEventListener('load', function () {
-      if (xhr.status === Code.SUCESS) {
-        onLoad(xhr.response);
-      } else {
-        onError('Статус ответа: ' + xhr.status + ' ' + xhr.statusText);
-      }
-    });
-    xhr.addEventListener('error', function () {
-      onError('Произошла ошибка соединения');
-    });
-    xhr.addEventListener('timeout', function () {
-      onError('Запрос не успел выполниться за ' + xhr.timeout + 'мс');
-    });
-
-    xhr.timeout = TIMEOUT;
+    request(onLoad, onError, xhr);
 
     xhr.open('POST', Url.SEND);
     xhr.send(data);

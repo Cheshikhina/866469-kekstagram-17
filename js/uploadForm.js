@@ -1,6 +1,6 @@
 'use strict';
 
-(function () {
+window.uoloadForm = (function () {
   var SCALE_MIN = 0.25;
   var SCALE_MAX = 1;
   var LEVEL_MAX = 453;
@@ -239,8 +239,6 @@
     addCloseEsc();
   });
 
-  //
-
   var inputHashtagHandler = function () {
     var allTags = [];
     allTags = textHashtag.value.trim().toLowerCase().split(' ' || ', ');
@@ -262,10 +260,22 @@
     var checkOneHashtag = function (arr) {
       var a;
       arr.some(function (item) {
-        if (item[0] === '#' && item.length === 1) {
+        if (item === '#' && item.length === 1) {
           a = false;
         } else {
           a = true;
+        }
+      });
+      return a;
+    };
+
+    var checkSpaceBetweenHashtag = function (arr) {
+      var a;
+      arr.every(function (item) {
+        if (item.indexOf('#') === item.lastIndexOf('#')) {
+          a = true;
+        } else {
+          a = false;
         }
       });
       return a;
@@ -294,22 +304,24 @@
       if (checkFirstSimbol(allTags) === false) {
         textHashtag.setCustomValidity('Xэш-тег начинается с символа # (решётка)');
         textHashtag.style = ERROR_TAG;
-      }
-      if (checkOneHashtag(allTags) === false) {
+      } else if (checkOneHashtag(allTags) === false) {
         textHashtag.setCustomValidity('Xеш-тег не может состоять только из одного символа # (решётка)');
         textHashtag.style = ERROR_TAG;
-      }
-      if (sameHashtag === false) {
+      } else if (sameHashtag === false) {
         textHashtag.setCustomValidity('Один и тот же хэш-тег не может быть использован дважды');
         textHashtag.style = ERROR_TAG;
-      }
-      if (allTags.length > TAG_MAX) {
+      } else if (allTags.length > TAG_MAX) {
         textHashtag.setCustomValidity('Нельзя указать больше ' + TAG_MAX + ' хэш-тегов');
         textHashtag.style = ERROR_TAG;
-      }
-      if (checkLengthHashtag(allTags, TAG_LENGT_MAX) === false) {
+      } else if (checkLengthHashtag(allTags, TAG_LENGT_MAX) === false) {
         textHashtag.setCustomValidity('Максимальная длина одного хэш-тега 20 символов, включая символ # (решётка)');
         textHashtag.style = ERROR_TAG;
+      } else if (checkSpaceBetweenHashtag(allTags) === false) {
+        textHashtag.setCustomValidity('Xэш-теги разделяются пробелами');
+        textHashtag.style = ERROR_TAG;
+      } else {
+        textHashtag.setCustomValidity('');
+        textHashtag.style = '';
       }
     }
   };
@@ -339,8 +351,6 @@
   textDescription.addEventListener('blur', function () {
     addCloseEsc();
   });
-
-  //
 
   var formSuccessHandler = function () {
     closeForm();
@@ -397,13 +407,13 @@
       var clickedButton = evt.target;
       evt.stopPropagation();
 
-      if (clickedButton.innerText === 'ПОПРОБОВАТЬ СНОВА') {
+      if (clickedButton.textContent === 'ПОПРОБОВАТЬ СНОВА') {
         uploadForm.classList.remove('hidden');
       }
-      if (clickedButton.innerText === 'ЗАГРУЗИТЬ ДРУГОЙ ФАЙЛ') {
+      if (clickedButton.textContent === 'ЗАГРУЗИТЬ ДРУГОЙ ФАЙЛ') {
         closeErrorMessage();
-        var uploadFormOpenAvto = function (elem, event) {
-          var changeEvent = new Event(event);
+        var uploadFormOpenAvto = function (elem, evtName) {
+          var changeEvent = new Event(evtName);
           elem.dispatchEvent(changeEvent);
         };
         uploadFormOpenAvto(uploadFormOpen, 'change');

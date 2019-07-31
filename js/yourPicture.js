@@ -1,6 +1,6 @@
 'use strict';
 
-(function () {
+window.yourPicture = (function () {
   var FILE_TYPES = ['gif', 'jpg', 'jpeg', 'png'];
 
   var fileChooser = document.querySelector('#upload-file');
