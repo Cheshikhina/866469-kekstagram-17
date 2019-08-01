@@ -7,13 +7,12 @@ window.util = (function () {
   };
 
   var shuffle = function (arr) {
-    for (var i = arr.length - 1; i > 0; i--) {
-      var num = Math.floor(Math.random() * (i + 1));
+    arr.forEach(function (el, index) {
+      var num = Math.floor(Math.random() * (index + 1));
       var d = arr[num];
-      arr[num] = arr[i];
-      arr[i] = d;
-    }
-    return arr;
+      arr[num] = arr[index];
+      arr[index] = d;
+    });
   };
 
   var debounce = function (cb, interval) {
@@ -35,7 +34,7 @@ window.util = (function () {
   };
 
   var removeElementsByClass = function (className) {
-    var elements = document.getElementsByClassName(className);
+    var elements = document.querySelector(className).children;
     while (elements.length > 0) {
       elements[0].parentNode.removeChild(elements[0]);
     }

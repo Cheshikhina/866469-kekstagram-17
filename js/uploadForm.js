@@ -246,39 +246,21 @@ window.uoloadForm = (function () {
     textHashtag.style = '';
 
     var checkFirstSimbol = function (arr) {
-      var a;
-      arr.some(function (item) {
-        if (item[0] !== '#') {
-          a = false;
-        } else {
-          a = true;
-        }
+      return arr.some(function (item) {
+        return item[0] !== '#';
       });
-      return a;
     };
 
     var checkOneHashtag = function (arr) {
-      var a;
-      arr.some(function (item) {
-        if (item === '#' && item.length === 1) {
-          a = false;
-        } else {
-          a = true;
-        }
+      return arr.some(function (item) {
+        return item === '#' && item.length === 1;
       });
-      return a;
     };
 
     var checkSpaceBetweenHashtag = function (arr) {
-      var a;
-      arr.every(function (item) {
-        if (item.indexOf('#') === item.lastIndexOf('#')) {
-          a = true;
-        } else {
-          a = false;
-        }
+      return arr.every(function (item) {
+        return item.indexOf('#') === item.lastIndexOf('#');
       });
-      return a;
     };
 
     var sameHashtag = allTags.every(function (elem, i, array) {
@@ -286,25 +268,19 @@ window.uoloadForm = (function () {
     });
 
     var checkLengthHashtag = function (arr, max) {
-      var a;
-      arr.some(function (item) {
-        if (item.length > max) {
-          a = false;
-        } else {
-          a = true;
-        }
+      return arr.some(function (item) {
+        return item.length > max;
       });
-      return a;
     };
 
     if (textHashtag.value.trim() === '') {
       textHashtag.setCustomValidity('');
       textHashtag.style = '';
     } else {
-      if (checkFirstSimbol(allTags) === false) {
-        textHashtag.setCustomValidity('Xэш-тег начинается с символа # (решётка)');
+      if (checkFirstSimbol(allTags) === true) {
+        textHashtag.setCustomValidity('Xэш-тег должен начинаться с символа # (решётка)');
         textHashtag.style = ERROR_TAG;
-      } else if (checkOneHashtag(allTags) === false) {
+      } else if (checkOneHashtag(allTags) === true) {
         textHashtag.setCustomValidity('Xеш-тег не может состоять только из одного символа # (решётка)');
         textHashtag.style = ERROR_TAG;
       } else if (sameHashtag === false) {
@@ -313,11 +289,11 @@ window.uoloadForm = (function () {
       } else if (allTags.length > TAG_MAX) {
         textHashtag.setCustomValidity('Нельзя указать больше ' + TAG_MAX + ' хэш-тегов');
         textHashtag.style = ERROR_TAG;
-      } else if (checkLengthHashtag(allTags, TAG_LENGT_MAX) === false) {
+      } else if (checkLengthHashtag(allTags, TAG_LENGT_MAX) === true) {
         textHashtag.setCustomValidity('Максимальная длина одного хэш-тега 20 символов, включая символ # (решётка)');
         textHashtag.style = ERROR_TAG;
       } else if (checkSpaceBetweenHashtag(allTags) === false) {
-        textHashtag.setCustomValidity('Xэш-теги разделяются пробелами');
+        textHashtag.setCustomValidity('Xэш-теги должны разделяться пробелами');
         textHashtag.style = ERROR_TAG;
       } else {
         textHashtag.setCustomValidity('');

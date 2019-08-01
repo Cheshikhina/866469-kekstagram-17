@@ -33,7 +33,8 @@ window.preview = (function () {
   };
 
   var getBigPhoto = function (photo) {
-    window.util.removeElementsByClass('social__comment');
+    window.util.removeElementsByClass('.social__comments');
+
     var allComments = photo.comments;
     document.querySelector('body').classList.toggle('modal-open');
 
