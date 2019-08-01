@@ -11,7 +11,8 @@ window.backend = (function () {
     SUCESS: 200,
   };
 
-  var request = function (onLoad, onError, xhr) {
+  var request = function (onLoad, onError) {
+    var xhr = new XMLHttpRequest();
     xhr.responseType = 'json';
     xhr.addEventListener('load', function () {
       if (xhr.status === Code.SUCESS) {
@@ -28,19 +29,18 @@ window.backend = (function () {
     });
 
     xhr.timeout = TIMEOUT;
+    return xhr;
   };
 
   var load = function (onLoad, onError) {
-    var xhr = new XMLHttpRequest();
-    request(onLoad, onError, xhr);
+    var xhr = request(onLoad, onError);
 
     xhr.open('GET', Url.DATA);
     xhr.send();
   };
 
   var save = function (data, onLoad, onError) {
-    var xhr = new XMLHttpRequest();
-    request(onLoad, onError, xhr);
+    var xhr = request(onLoad, onError);
 
     xhr.open('POST', Url.SEND);
     xhr.send(data);

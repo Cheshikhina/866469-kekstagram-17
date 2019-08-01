@@ -1,6 +1,6 @@
 'use strict';
 
-window.uoloadForm = (function () {
+window.uploadForm = (function () {
   var SCALE_MIN = 0.25;
   var SCALE_MAX = 1;
   var LEVEL_MAX = 453;
@@ -366,6 +366,19 @@ window.uoloadForm = (function () {
     successButton.addEventListener('click', closeSuccessMessage);
   };
 
+  var closeErrorMessage = function () {
+    var error = document.querySelector('.error');
+    document.querySelector('main').removeChild(error);
+    document.removeEventListener('click', addCloseErrorMessageClickAll);
+  };
+
+  var addCloseErrorMessageClickAll = function (evt) {
+    var clickElement = evt.target;
+    if (clickElement.className === 'error') {
+      closeErrorMessage();
+    }
+  };
+
   var formErrorHandler = function () {
     uploadForm.classList.add('hidden');
     var similarErrorMessage = document.querySelector('#error')
@@ -373,36 +386,17 @@ window.uoloadForm = (function () {
       .querySelector('.error');
 
     var errorMessage = similarErrorMessage.cloneNode(true);
+    errorMessage.querySelector('.error__buttons button:first-child').addEventListener('click', function () {
+      uploadForm.classList.remove('hidden');
+      closeErrorMessage();
+    });
+
+    errorMessage.querySelector('.error__buttons button:last-child').addEventListener('click', function () {
+      closeForm();
+      closeErrorMessage();
+    });
+
     document.querySelector('main').appendChild(errorMessage);
-
-    var error = document.querySelector('.error');
-
-    var errorButtons = document.querySelector('.error__buttons');
-
-    var clickErrorButtonHandler = function (evt) {
-      var clickedButton = evt.target;
-      evt.stopPropagation();
-
-      if (clickedButton.textContent === 'ПОПРОБОВАТЬ СНОВА') {
-        uploadForm.classList.remove('hidden');
-      }
-      if (clickedButton.textContent === 'ЗАГРУЗИТЬ ДРУГОЙ ФАЙЛ') {
-        closeErrorMessage();
-        var uploadFormOpenAvto = function (elem, evtName) {
-          var changeEvent = new Event(evtName);
-          elem.dispatchEvent(changeEvent);
-        };
-        uploadFormOpenAvto(uploadFormOpen, 'change');
-      }
-
-      document.querySelector('main').removeChild(error);
-    };
-
-    var closeErrorMessage = function () {
-      document.querySelector('main').removeChild(error);
-      errorButtons.removeEventListener('click', clickErrorButtonHandler);
-      document.removeEventListener('click', addCloseErrorMessageClickAll);
-    };
 
     var addCloseEscErrorMessage = function () {
       document.addEventListener('keydown', function (evt) {
@@ -412,16 +406,9 @@ window.uoloadForm = (function () {
       });
     };
 
-    var addCloseErrorMessageClickAll = function (evt) {
-      var clickElement = evt.target;
-      if (clickElement.className === 'error') {
-        closeErrorMessage();
-      }
-    };
-
     addCloseEscErrorMessage();
     document.addEventListener('click', addCloseErrorMessageClickAll);
-    errorButtons.addEventListener('click', clickErrorButtonHandler);
+    // errorButtons.addEventListener('click', clickErrorButtonHandler);
   };
 
 
