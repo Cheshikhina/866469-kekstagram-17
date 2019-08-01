@@ -1,14 +1,15 @@
 'use strict';
 
-(function () {
+window.data = (function () {
   var DEBOUNCE_INTERVAL = 500;
+  var NEW_PHOTO_MAX = 10;
   var butonsForm = document.querySelector('.img-filters__form');
   var butons = document.querySelectorAll('.img-filters__button');
   var ourPictures = [];
 
   var successHandler = function (pictures) {
     ourPictures = pictures;
-    window.render.newPhotos(pictures);
+    window.render.getNewPhotos(pictures);
 
     var imgFilter = document.querySelector('.img-filters');
     imgFilter.classList.remove('img-filters--inactive');
@@ -48,14 +49,14 @@
     }
     if (clickedElement.id === 'filter-new') {
       window.util.shuffle(copyOurPictures);
-      copyOurPictures = copyOurPictures.slice(0, 10);
+      copyOurPictures = copyOurPictures.slice(0, NEW_PHOTO_MAX);
     }
 
     var allPhotos = document.querySelectorAll('.pictures .picture');
     allPhotos.forEach(function (item) {
       item.remove();
     });
-    window.render.newPhotos(copyOurPictures);
+    window.render.getNewPhotos(copyOurPictures);
   }, DEBOUNCE_INTERVAL);
 
 })();

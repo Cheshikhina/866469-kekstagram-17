@@ -1,7 +1,7 @@
 'use strict';
 
 window.preview = (function () {
-  var MAX_INT_AVATAR = 6;
+  var INT_AVATAR_MAX = 6;
   var CURRENT_LIMIT = 5;
   var bigPhoto = document.querySelector('.big-picture');
   var commentCount = bigPhoto.querySelector('.social__comment-count');
@@ -14,6 +14,7 @@ window.preview = (function () {
     var newComment = similarSocialComment.cloneNode(true);
 
     newComment.querySelector('.social__text').textContent = comment.message;
+    newComment.querySelector('.social__picture').alt = comment.name;
     newComment.querySelector('.social__picture').src = comment.avatar;
 
     return newComment;
@@ -32,23 +33,24 @@ window.preview = (function () {
   };
 
   var getBigPhoto = function (photo) {
-    window.util.removeElementsByClass('social__comment');
+    window.util.removeElementsByClass('.social__comments');
+
     var allComments = photo.comments;
+    document.querySelector('body').classList.toggle('modal-open');
 
     bigPhoto.classList.remove('hidden');
 
     commentCount.classList.remove('visually-hidden');
-    commentLoader.classList.remove('visually-hidden');
+    commentLoader.classList.remove('hidden');
 
     if (allComments.length < CURRENT_LIMIT) {
-      commentCount.classList.add('visually-hidden');
-      commentLoader.classList.add('visually-hidden');
+      commentLoader.classList.add('hidden');
     }
 
     bigPhoto.querySelector('.big-picture__img img').src = photo.url;
     bigPhoto.querySelector('.likes-count').textContent = photo.likes;
     bigPhoto.querySelector('.comments-count').textContent = photo.comments.length;
-    bigPhoto.querySelector('.social__picture').src = 'img/avatar-' + window.util.getRandomInt(1, MAX_INT_AVATAR) + '.svg';
+    bigPhoto.querySelector('.social__picture').src = 'img/avatar-' + window.util.getRandomInt(1, INT_AVATAR_MAX) + '.svg';
     bigPhoto.querySelector('.social__caption').textContent = photo.description;
 
 
@@ -57,12 +59,10 @@ window.preview = (function () {
 
 
     var commentLoaderHandler = function () {
-      window.util.removeElementsByClass('social__comment');
       allComments = allComments.slice(CURRENT_LIMIT);
 
-      if (allComments.length < CURRENT_LIMIT) {
-        commentLoader.classList.add('visually-hidden');
-        commentCount.classList.add('visually-hidden');
+      if (allComments.length < CURRENT_LIMIT || allComments.length % CURRENT_LIMIT === 0) {
+        commentLoader.classList.add('hidden');
       }
 
       getComments(allComments);
@@ -83,6 +83,7 @@ window.preview = (function () {
 
     var closePhoto = function () {
       bigPhoto.classList.add('hidden');
+      document.querySelector('body').classList.toggle('modal-open');
       commentLoader.removeEventListener('click', commentLoaderHandler);
       removeCloseEsc();
     };

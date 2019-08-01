@@ -1,6 +1,6 @@
 'use strict';
 
-(function () {
+window.uploadForm = (function () {
   var SCALE_MIN = 0.25;
   var SCALE_MAX = 1;
   var LEVEL_MAX = 453;
@@ -74,6 +74,7 @@
     document.addEventListener('keydown', formCloseEscHandler);
   };
 
+
   var removeCloseEsc = function () {
     document.removeEventListener('keydown', formCloseEscHandler);
   };
@@ -89,6 +90,7 @@
     uploadPreview.style.filter = '';
     textHashtag.addEventListener('input', inputHashtagHandler);
     textDescription.addEventListener('input', inputDescriptionHandler);
+    uploadMainForm.addEventListener('submit', pressUploadButton);
   };
 
   var updateUploadForm = function () {
@@ -107,6 +109,7 @@
     uploadMainForm.reset();
     textHashtag.removeEventListener('input', inputHashtagHandler);
     textDescription.removeEventListener('input', inputDescriptionHandler);
+    uploadMainForm.removeEventListener('submit', pressUploadButton);
   };
 
   var scaleControlSmaller = function () {
@@ -236,11 +239,6 @@
     addCloseEsc();
   });
 
-  //
-
-  // var uploadButton = uploadForm.querySelector('.img-upload__submit');
-
-
   var inputHashtagHandler = function () {
     var allTags = [];
     allTags = textHashtag.value.trim().toLowerCase().split(' ' || ', ');
@@ -248,27 +246,21 @@
     textHashtag.style = '';
 
     var checkFirstSimbol = function (arr) {
-      var a;
-      arr.some(function (item) {
-        if (item[0] !== '#') {
-          a = false;
-        } else {
-          a = true;
-        }
+      return arr.some(function (item) {
+        return item[0] !== '#';
       });
-      return a;
     };
 
     var checkOneHashtag = function (arr) {
-      var a;
-      arr.some(function (item) {
-        if (item[0] === '#' && item.length === 1) {
-          a = false;
-        } else {
-          a = true;
-        }
+      return arr.some(function (item) {
+        return item === '#' && item.length === 1;
       });
-      return a;
+    };
+
+    var checkSpaceBetweenHashtag = function (arr) {
+      return arr.every(function (item) {
+        return item.indexOf('#') === item.lastIndexOf('#');
+      });
     };
 
     var sameHashtag = allTags.every(function (elem, i, array) {
@@ -276,40 +268,36 @@
     });
 
     var checkLengthHashtag = function (arr, max) {
-      var a;
-      arr.some(function (item) {
-        if (item.length > max) {
-          a = false;
-        } else {
-          a = true;
-        }
+      return arr.some(function (item) {
+        return item.length > max;
       });
-      return a;
     };
 
     if (textHashtag.value.trim() === '') {
       textHashtag.setCustomValidity('');
       textHashtag.style = '';
     } else {
-      if (checkFirstSimbol(allTags) === false) {
-        textHashtag.setCustomValidity('Xэш-тег начинается с символа # (решётка)');
+      if (checkFirstSimbol(allTags) === true) {
+        textHashtag.setCustomValidity('Xэш-тег должен начинаться с символа # (решётка)');
         textHashtag.style = ERROR_TAG;
-      }
-      if (checkOneHashtag(allTags) === false) {
+      } else if (checkOneHashtag(allTags) === true) {
         textHashtag.setCustomValidity('Xеш-тег не может состоять только из одного символа # (решётка)');
         textHashtag.style = ERROR_TAG;
-      }
-      if (sameHashtag === false) {
+      } else if (sameHashtag === false) {
         textHashtag.setCustomValidity('Один и тот же хэш-тег не может быть использован дважды');
         textHashtag.style = ERROR_TAG;
-      }
-      if (allTags.length > TAG_MAX) {
+      } else if (allTags.length > TAG_MAX) {
         textHashtag.setCustomValidity('Нельзя указать больше ' + TAG_MAX + ' хэш-тегов');
         textHashtag.style = ERROR_TAG;
-      }
-      if (checkLengthHashtag(allTags, TAG_LENGT_MAX) === false) {
+      } else if (checkLengthHashtag(allTags, TAG_LENGT_MAX) === true) {
         textHashtag.setCustomValidity('Максимальная длина одного хэш-тега 20 символов, включая символ # (решётка)');
         textHashtag.style = ERROR_TAG;
+      } else if (checkSpaceBetweenHashtag(allTags) === false) {
+        textHashtag.setCustomValidity('Xэш-теги должны разделяться пробелами');
+        textHashtag.style = ERROR_TAG;
+      } else {
+        textHashtag.setCustomValidity('');
+        textHashtag.style = '';
       }
     }
   };
@@ -340,43 +328,93 @@
     addCloseEsc();
   });
 
-  //
-
   var formSuccessHandler = function () {
     closeForm();
-
     var similarSucessMessage = document.querySelector('#success')
       .content
       .querySelector('.success');
-
     var sucessMessage = similarSucessMessage.cloneNode(true);
-    document.querySelector('.main').appendChild(sucessMessage);
+    document.querySelector('main').appendChild(sucessMessage);
 
     var success = document.querySelector('.success');
 
     var successButton = document.querySelector('.success__button');
-    successButton.addEventListener('click', function () {
-      document.querySelector('.main').removeChild(success);
-    });
+
+    var closeSuccessMessage = function () {
+      document.querySelector('main').removeChild(success);
+      successButton.removeEventListener('click', closeSuccessMessage);
+      document.removeEventListener('click', addCloseSuccessMessageClickAll);
+    };
+
+    var addCloseEscSuccessMessage = function () {
+      document.addEventListener('keydown', function (evt) {
+        if (evt.keyCode === window.util.KeyCode.ESC) {
+          closeSuccessMessage();
+        }
+      });
+    };
+
+    var addCloseSuccessMessageClickAll = function (evt) {
+      var clickElement = evt.target;
+      if (clickElement.className === 'success') {
+        closeSuccessMessage();
+      }
+    };
+
+    addCloseEscSuccessMessage();
+    document.addEventListener('click', addCloseSuccessMessageClickAll);
+    successButton.addEventListener('click', closeSuccessMessage);
+  };
+
+  var closeErrorMessage = function () {
+    var error = document.querySelector('.error');
+    document.querySelector('main').removeChild(error);
+    document.removeEventListener('click', addCloseErrorMessageClickAll);
+  };
+
+  var addCloseErrorMessageClickAll = function (evt) {
+    var clickElement = evt.target;
+    if (clickElement.className === 'error') {
+      closeErrorMessage();
+    }
   };
 
   var formErrorHandler = function () {
+    uploadForm.classList.add('hidden');
     var similarErrorMessage = document.querySelector('#error')
       .content
       .querySelector('.error');
 
     var errorMessage = similarErrorMessage.cloneNode(true);
-    document.querySelector('.main').appendChild(errorMessage);
-
-    var error = document.querySelector('.error');
-
-    var errorButton = document.querySelector('.error__button');
-    errorButton.addEventListener('click', function () {
-      document.querySelector('.main').removeChild(error);
-
+    errorMessage.querySelector('.error__buttons button:first-child').addEventListener('click', function () {
+      uploadForm.classList.remove('hidden');
+      closeErrorMessage();
     });
+
+    errorMessage.querySelector('.error__buttons button:last-child').addEventListener('click', function () {
+      closeForm();
+      closeErrorMessage();
+    });
+
+    document.querySelector('main').appendChild(errorMessage);
+
+    var addCloseEscErrorMessage = function () {
+      document.addEventListener('keydown', function (evt) {
+        if (evt.keyCode === window.util.KeyCode.ESC) {
+          closeErrorMessage();
+        }
+      });
+    };
+
+    addCloseEscErrorMessage();
+    document.addEventListener('click', addCloseErrorMessageClickAll);
+    // errorButtons.addEventListener('click', clickErrorButtonHandler);
   };
 
-  window.backend.save(new FormData(uploadMainForm), formSuccessHandler, formErrorHandler);
+
+  var pressUploadButton = function (evt) {
+    evt.preventDefault();
+    window.backend.save(new FormData(uploadMainForm), formSuccessHandler, formErrorHandler);
+  };
 
 })();
