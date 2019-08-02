@@ -6,6 +6,7 @@ window.uploadForm = (function () {
   var LEVEL_MAX = 453;
   var TAG_MAX = 5;
   var TAG_LENGT_MAX = 20;
+  var COMMENT_LENGT_MAX = 140;
   var ERROR_TAG = 'border: 2px solid red; background-color: #ffc1ab;';
   var uploadFormOpen = document.querySelector('#upload-file');
   var uploadMainForm = document.querySelector('.img-upload__form');
@@ -259,7 +260,7 @@ window.uploadForm = (function () {
 
     var checkSpaceBetweenHashtag = function (arr) {
       return arr.every(function (item) {
-        return item.indexOf('#') === item.lastIndexOf('#');
+        return item.indexOf('#') !== item.lastIndexOf('#');
       });
     };
 
@@ -277,22 +278,22 @@ window.uploadForm = (function () {
       textHashtag.setCustomValidity('');
       textHashtag.style = '';
     } else {
-      if (checkFirstSimbol(allTags) === true) {
+      if (checkFirstSimbol(allTags)) {
         textHashtag.setCustomValidity('Xэш-тег должен начинаться с символа # (решётка)');
         textHashtag.style = ERROR_TAG;
-      } else if (checkOneHashtag(allTags) === true) {
+      } else if (checkOneHashtag(allTags)) {
         textHashtag.setCustomValidity('Xеш-тег не может состоять только из одного символа # (решётка)');
         textHashtag.style = ERROR_TAG;
-      } else if (sameHashtag === false) {
+      } else if (!sameHashtag) {
         textHashtag.setCustomValidity('Один и тот же хэш-тег не может быть использован дважды');
         textHashtag.style = ERROR_TAG;
       } else if (allTags.length > TAG_MAX) {
         textHashtag.setCustomValidity('Нельзя указать больше ' + TAG_MAX + ' хэш-тегов');
         textHashtag.style = ERROR_TAG;
-      } else if (checkLengthHashtag(allTags, TAG_LENGT_MAX) === true) {
+      } else if (checkLengthHashtag(allTags, TAG_LENGT_MAX)) {
         textHashtag.setCustomValidity('Максимальная длина одного хэш-тега 20 символов, включая символ # (решётка)');
         textHashtag.style = ERROR_TAG;
-      } else if (checkSpaceBetweenHashtag(allTags) === false) {
+      } else if (checkSpaceBetweenHashtag(allTags)) {
         textHashtag.setCustomValidity('Xэш-теги должны разделяться пробелами');
         textHashtag.style = ERROR_TAG;
       } else {
@@ -306,7 +307,7 @@ window.uploadForm = (function () {
     var allSimbol = textDescription.value.split('');
     textDescription.style = '';
 
-    if (allSimbol.length > 140) {
+    if (allSimbol.length > COMMENT_LENGT_MAX) {
       textDescription.setCustomValidity('Длина комментария не может составлять больше 140 символов');
       textDescription.style = ERROR_TAG;
     }
@@ -408,7 +409,6 @@ window.uploadForm = (function () {
 
     addCloseEscErrorMessage();
     document.addEventListener('click', addCloseErrorMessageClickAll);
-    // errorButtons.addEventListener('click', clickErrorButtonHandler);
   };
 
 
